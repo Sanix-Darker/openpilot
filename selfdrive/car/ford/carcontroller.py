@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from cereal import car
 from common.numpy_fast import clip
 from opendbc.can.packer import CANPacker
@@ -41,6 +43,14 @@ class CarController:
     elif CS.acc_tja_status_stock_values["Tja_D_Stat"] != 0 and (self.frame % CarControllerParams.ACC_UI_STEP) == 0:
       can_sends.append(create_button_msg(self.packer, CS.buttons_stock_values, tja_toggle=True))
 
+    exp_1 = Path("/data/Exp1").is_file()
+    exp_2 = Path("/data/Exp2").is_file()
+    exp_3 = Path("/data/Exp3").is_file()
+    exp_4 = Path("/data/Exp4").is_file()
+    exp_5 = Path("/data/Exp5").is_file()
+    exp_6 = Path("/data/Exp6").is_file()
+    exp_7 = Path("/data/Exp7").is_file()
+
     ### lateral control ###
     # send steering commands at 20Hz
     if (self.frame % CarControllerParams.STEER_STEP) == 0:
@@ -49,7 +59,8 @@ class CarController:
         apply_curvature = apply_std_steer_angle_limits(actuators.curvature, self.apply_curvature_last, CS.out.vEgo, CarControllerParams)
         apply_curvature = clip(apply_curvature, -CarControllerParams.CURVATURE_MAX, CarControllerParams.CURVATURE_MAX)
 
-        mode = 2 if CS.out.steeringPressed else 1
+        exp_mode = 7 if exp_7 else 6 if exp_6 else 5 if exp_5 else 4 if exp_4 else 3 if exp_3 else 2 if exp_2 else 1 if exp_1 else 0
+        mode = exp_mode if CS.out.steeringPressed else 1
       else:
         apply_curvature = 0.
         mode = 0
